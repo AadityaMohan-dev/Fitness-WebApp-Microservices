@@ -5,9 +5,9 @@
       <profile name="Gradle Imported" enabled="true">
         <outputRelativeToContentRoot value="true" />
         <processorPath useClasspath="false">
-          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.34/ec547ef414ab1d2c040118fb9c1c265ada63af14/lombok-1.18.34.jar" />
+          <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.40/398c6d2d7c42c96b65e78d2ddc9be0058c163453/lombok-1.18.40.jar" />
         </processorPath>
-        <module name="userservice.main" />
+        <module name="aiservice.main" />
       </profile>
     </annotationProcessing>
   </component>
@@ -16,6 +16,9 @@
       <module name="activityservice" options="-parameters" />
       <module name="activityservice.main" options="-parameters" />
       <module name="activityservice.test" options="-parameters" />
+      <module name="aiservice" options="-parameters" />
+      <module name="aiservice.main" options="-parameters" />
+      <module name="aiservice.test" options="-parameters" />
       <module name="eureka" options="-parameters" />
       <module name="eureka.main" options="-parameters" />
       <module name="eureka.test" options="-parameters" />
