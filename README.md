@@ -120,10 +120,3 @@ Contributions are welcome! Please fork the repo and submit a PR.
 
 ---
 
-## 📜 License
-
-MIT License.
-
----
-
-Would you like me to also create a **docker-compose.yml** file for all microservices + databases + RabbitMQ + Eureka, so that you can run everything in one command?
