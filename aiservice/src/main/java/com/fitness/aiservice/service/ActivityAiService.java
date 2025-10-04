@@ -52,10 +52,39 @@ public class ActivityAiService {
             addAnalysisSection(fullAnalysis , analysisNode , "caloriesBurned", "Calories :");
 
             List<String> improvements = extractImprovements(analysisJson.path("improvements"));
+            List<String> suggestions = extractSuggestions(analysisJson.path("suggestions"));
+            List<String> safety = extractSafetyGuidlines(analysisJson.path("safety"));
+
         } catch (Exception e) {
             e.printStackTrace();
         }
         return aiResponse;
+    }
+
+    private List<String> extractSafetyGuidlines(JsonNode safetyNode) {
+        List<String> safety = new ArrayList<>();
+        if(safetyNode.isArray()){
+            safetyNode.forEach(item -> {
+                safety.add(item.asText());
+            });
+        }
+        return safety.isEmpty() ?
+                Collections.singletonList("Follow general safety guidelines") : safety;
+    }
+
+    private List<String> extractSuggestions(JsonNode suggestionsNode) {
+        List<String> suggestions = new ArrayList<>();
+        if(suggestionsNode.isArray()){
+            suggestionsNode.forEach(suggestion ->{
+                String workout = suggestion.path("workout").asText();
+                String description = suggestion.path("description").asText();
+
+                suggestions.add(String.format("%s: %s", workout, description));
+            });
+        }
+        return suggestions.isEmpty() ?
+                Collections.singletonList("No specific suggestions provided") :
+                suggestions;
     }
 
     private List<String> extractImprovements(JsonNode improvementsNode) {
@@ -67,10 +96,8 @@ public class ActivityAiService {
 
                 improvements.add(String.format("%s: %s", area, detail));
             });
-
-            return improvements.isEmpty() ? Collections.singletonList("No Specific improvements provided") : improvements;
-        }
-        return improvements;
+           }
+        return improvements.isEmpty() ? Collections.singletonList("No Specific improvements provided") : improvements;
     }
 
     private void addAnalysisSection(StringBuilder fullAnalysis, JsonNode analysisNode, String key, String prefix) {
