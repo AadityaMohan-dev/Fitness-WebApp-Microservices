@@ -2,12 +2,16 @@ package com.fitness.aiservice.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fitness.aiservice.controller.RecommendationController;
 import com.fitness.aiservice.model.Activity;
+import com.fitness.aiservice.model.Recommendation;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 
@@ -18,14 +22,14 @@ public class ActivityAiService {
 
     private final GeminiService geminiService;
 
-    public String generateRecommendation(Activity activity){
+    public Recommendation generateRecommendation(Activity activity){
         String prompt = createPromptForActivity(activity);
         String aiResponse = geminiService.getAnswer(prompt);
         log.info("RESPONSE FROM AI: {}", aiResponse);
         return processAiResponse(activity , aiResponse);
     }
 
-    private String processAiResponse(Activity activity, String aiResponse){
+    private Recommendation processAiResponse(Activity activity, String aiResponse){
         try{
             ObjectMapper mapper =new ObjectMapper();
             JsonNode rootNode = mapper.readTree(aiResponse);
@@ -55,10 +59,36 @@ public class ActivityAiService {
             List<String> suggestions = extractSuggestions(analysisJson.path("suggestions"));
             List<String> safety = extractSafetyGuidlines(analysisJson.path("safety"));
 
+            return Recommendation.builder()
+                    .activityId(activity.getId())
+                    .userId(activity.getUserId())
+                    .activityType(activity.getType())
+                    .recommendation(fullAnalysis.toString().trim())
+                    .improvements(improvements)
+                    .suggestions(suggestions)
+                    .safety(safety)
+                    .createdAt(LocalDateTime.now())
+                    .build();
         } catch (Exception e) {
             e.printStackTrace();
+            return  createDefaultRecommendation(activity);
         }
-        return aiResponse;
+
+    }
+
+    private Recommendation createDefaultRecommendation(Activity activity) {
+        return Recommendation.builder()
+                .activityId(activity.getId())
+                .userId(activity.getUserId())
+                .activityType(activity.getType())
+                .recommendation("Unable to generate detailed analysis")
+                .improvements(Collections.singletonList("Continue with your current routien"))
+                .suggestions(Collections.singletonList("Consider consulting a professional"))
+                .safety(Arrays.asList("Always warmup before exercise",
+                        "Stay hydrate",
+                        "Listen to your body"))
+                .createdAt(LocalDateTime.now())
+                .build();
     }
 
     private List<String> extractSafetyGuidlines(JsonNode safetyNode) {
